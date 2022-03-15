@@ -114,7 +114,7 @@
                 break;
             }
             case TYPE_NONTERMINAL: {
-                printf("%s: (%d)\n", node->nodeName, node->nodeRow);
+                printf("%s (%d)\n", node->nodeName, node->nodeRow);
                 break;
             }
         }
