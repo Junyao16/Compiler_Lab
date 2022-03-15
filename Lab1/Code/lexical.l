@@ -298,10 +298,6 @@ ID ({letter}|_)({letter}|{digit}|_)*
     return WHILE;
 }
 
-{WS} {
-    /* DO NOTHING */
-}
-
 {INT} {
     //printf("INT: %d at line %d\n", atoi(yytext), yylineno);
     yylval.treeNode = createTreeNode("INT", yytext, TYPE_INT, yylineno);
@@ -321,7 +317,12 @@ ID ({letter}|_)({letter}|{digit}|_)*
 }
 
 
-\n { yycolumn = 1; }
+"\n" { yycolumn = 1; }
+
+
+{WS} {
+    /* DO NOTHING */
+}
 
 . {
     printf("Error type A at line %d: Mysterious characters \'%s\'\n", yylineno, yytext);

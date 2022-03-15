@@ -3,7 +3,7 @@
     #include <string.h>
     #include "lex.yy.c"
 
-    void yyerror(const char* msg){
+    void yyerror(char* msg){
         printf("Error type B at Line %d: %s.\n", yylval.treeNode->nodeRow, msg);
     }
 
@@ -87,6 +87,20 @@
 
 
 %start Program
+
+
+%right ASSIGNOP
+%left OR AND
+%left RELOP
+%left PLUS MINUS
+%left STAR DIV
+%right NOT
+%left LP RP LB RB DOT
+
+
+%nonassoc LOWER_THAN_ELSE
+%nonassoc ELSE
+
 
 %%
 
@@ -253,7 +267,7 @@ Stmt: Exp SEMI{
     addTreeNodeChild($$, $2);
     addTreeNodeChild($$, $3);
 }
-| IF LP Exp RP Stmt{
+| IF LP Exp RP Stmt %prec LOWER_THAN_ELSE{
     $$ = createTreeNode("Stmt", NULL, TYPE_NONTERMINAL, @$.first_line);
     addTreeNodeChild($$, $1);
     addTreeNodeChild($$, $2);
