@@ -95,6 +95,7 @@
         for(int i = 0; i < nodeDepth; i++){
             printf("  ");
         }
+        //printf("%d\n", node->nodeType);
         switch(node->nodeType){
             case TYPE_INT: {
                 printf("%s: %d\n", node->nodeName, node->nodeValue.intValue);
@@ -105,7 +106,7 @@
                 break;
             }
             case TYPE_OTHER: {
-                if(node->nodeValue.stringValue == NULL){
+                if(node->nodeValue.stringValue[0] == '\0'){
                     printf("%s\n", node->nodeName);
                 }
                 else{
