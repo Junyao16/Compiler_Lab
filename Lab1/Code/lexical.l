@@ -274,7 +274,7 @@ ID ({letter}|_)({letter}|{digit}|_)*
 }
 {STRUCT} {
     //printf("STRUCT at line %d\n", yylineno);
-    yylval.treeNode = createTreeNode("SRTUCT", NULL, TYPE_OTHER, yylineno);
+    yylval.treeNode = createTreeNode("STRUCT", NULL, TYPE_OTHER, yylineno);
     return STRUCT;
 }
 {RETURN} {
