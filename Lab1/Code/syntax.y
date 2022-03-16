@@ -3,8 +3,11 @@
     #include <string.h>
     #include "lex.yy.c"
 
+    int haveError = 0;
+
     void yyerror(char* msg){
         printf("Error type B at Line %d: %s.\n", yylval.treeNode->nodeRow, msg);
+        haveError = 1;
     }
 
     int yyparse(void);
@@ -94,7 +97,7 @@
 %left RELOP
 %left PLUS MINUS
 %left STAR DIV
-%right NOT
+%right NOT UMINUS
 %left LP RP LB RB DOT
 
 
@@ -137,7 +140,16 @@ ExtDef: Specifier ExtDecList SEMI{
     addTreeNodeChild($$, $1);
     addTreeNodeChild($$, $2);
     addTreeNodeChild($$, $3);
-};
+}
+| error SEMI{
+
+}
+| Specifier error SEMI{
+
+}
+| error Specifier SEMI{
+
+;}
 
 ExtDecList: VarDec{
     $$ = createTreeNode("ExtDecList", NULL, TYPE_NONTERMINAL, @$.first_line);
@@ -173,6 +185,9 @@ StructSpecifier: STRUCT OptTag LC DefList RC{
     $$ = createTreeNode("StructSpecifier", NULL, TYPE_NONTERMINAL, @$.first_line);
     addTreeNodeChild($$, $1);
     addTreeNodeChild($$, $2);
+}
+| STRUCT OptTag LC error RC{
+
 };
 
 OptTag: ID{
@@ -200,6 +215,9 @@ VarDec: ID{
     addTreeNodeChild($$, $2);
     addTreeNodeChild($$, $3);
     addTreeNodeChild($$, $4);
+}
+| VarDec LB error RB{
+
 };
 
 FunDec: ID LP VarList RP{
@@ -214,6 +232,15 @@ FunDec: ID LP VarList RP{
     addTreeNodeChild($$, $1);
     addTreeNodeChild($$, $2);
     addTreeNodeChild($$, $3);
+}
+| ID LP error RP{
+
+}
+| ID error RP{
+
+}
+| error LP VarList RP{
+
 };
 
 VarList: ParamDec COMMA VarList{
@@ -241,6 +268,9 @@ CompSt: LC DefList StmtList RC{
     addTreeNodeChild($$, $2);
     addTreeNodeChild($$, $3);
     addTreeNodeChild($$, $4);
+}
+| LC error RC{
+
 };
 
 StmtList: Stmt StmtList{
@@ -292,7 +322,19 @@ Stmt: Exp SEMI{
     addTreeNodeChild($$, $3);
     addTreeNodeChild($$, $4);
     addTreeNodeChild($$, $5);
-};
+}
+| error SEMI{
+
+}
+| Exp error SEMI{
+
+}
+| RETURN Exp error{
+
+}
+| RETURN error SEMI{
+
+}
 
 
 /* 7.1.6 Local Definitions */
@@ -310,6 +352,12 @@ Def: Specifier DecList SEMI{
     addTreeNodeChild($$, $1);
     addTreeNodeChild($$, $2);
     addTreeNodeChild($$, $3);
+}
+| Specifier error SEMI{
+
+}
+| Specifier DecList error{
+    
 };
 
 DecList: Dec{
@@ -322,6 +370,7 @@ DecList: Dec{
     addTreeNodeChild($$, $2);
     addTreeNodeChild($$, $3);
 };
+
 Dec: VarDec{
     $$ = createTreeNode("Dec", NULL, TYPE_NONTERMINAL, @$.first_line);
     addTreeNodeChild($$, $1);
@@ -394,6 +443,11 @@ Exp: Exp ASSIGNOP Exp{
     addTreeNodeChild($$, $1);
     addTreeNodeChild($$, $2);
 }
+| MINUS Exp %prec UMINUS{
+	$$ = createTreeNode("Exp", NULL, TYPE_NONTERMINAL, @$.first_line);
+	addTreeNodeChild($$, $1);
+    addTreeNodeChild($$, $2);
+}
 | NOT Exp{
     $$ = createTreeNode("Exp", NULL, TYPE_NONTERMINAL, @$.first_line);
     addTreeNodeChild($$, $1);
@@ -434,6 +488,45 @@ Exp: Exp ASSIGNOP Exp{
 | FLOAT{
     $$ = createTreeNode("Exp", NULL, TYPE_NONTERMINAL, @$.first_line);
     addTreeNodeChild($$, $1);
+}
+|Exp ASSIGNOP error{
+    
+};
+|Exp AND error{
+    
+};
+|Exp OR error{
+    
+}
+|Exp RELOP error{
+    
+}
+|Exp PLUS error{
+    
+}
+|Exp MINUS error{
+    
+}
+|Exp STAR error{
+    
+}
+|Exp DIV error{
+    
+}
+|LP error RP{
+    
+}
+|MINUS error{
+    
+}
+|NOT error{
+    
+}
+|ID LP error RP{
+    
+}
+|Exp LB error RB{
+    
 };
 
 Args: Exp COMMA Args{

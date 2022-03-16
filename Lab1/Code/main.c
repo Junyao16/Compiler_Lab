@@ -4,6 +4,7 @@
 
 extern FILE* yyin;
 extern struct TreeNode* treeRoot;
+extern int haveError;
 
 int main(int argc, char** argv)
 {
@@ -17,7 +18,7 @@ int main(int argc, char** argv)
     yyrestart(f);
     yyparse();
 
-    printTree(treeRoot, 0);
+    if(!haveError) printTree(treeRoot, 0);
 
     return 0;
 }
