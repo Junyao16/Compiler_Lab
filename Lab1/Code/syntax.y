@@ -160,9 +160,6 @@ ExtDecList: VarDec{
     addTreeNodeChild($$, $1);
     addTreeNodeChild($$, $2);
     addTreeNodeChild($$, $3);
-}
-| VarDec error ExtDefList{
-    
 };
 
 
