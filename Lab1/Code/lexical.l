@@ -8,7 +8,7 @@
         yylloc.last_column = yycolumn + yyleng - 1; \
         yycolumn += yyleng;
 
-    
+    extern int haveError;
     
     
     enum TYPE_NODE{
@@ -195,7 +195,7 @@ ID ({letter}|_)({letter}|{digit}|_)*
 }
 {RELOP} {
     //printf("RELOP at line %d\n", yylineno);
-    yylval.treeNode = createTreeNode("RELOP", yytext, TYPE_OTHER, yylineno);
+    yylval.treeNode = createTreeNode("RELOP", NULL, TYPE_OTHER, yylineno);
     return RELOP;
 }
 {PLUS} {
@@ -326,7 +326,8 @@ ID ({letter}|_)({letter}|{digit}|_)*
 }
 
 . {
-    printf("Error type A at line %d: Mysterious characters \'%s\'\n", yylineno, yytext);
+    printf("Error type A at Line %d: Mysterious characters \'%s\'\n", yylineno, yytext);
+    haveError = 1;
 }
 
 %%

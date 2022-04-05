@@ -358,6 +358,9 @@ Def: Specifier DecList SEMI{
 }
 | Specifier DecList error{
     
+}
+| error SEMI{
+
 };
 
 DecList: Dec{
@@ -458,6 +461,7 @@ Exp: Exp ASSIGNOP Exp{
     addTreeNodeChild($$, $1);
     addTreeNodeChild($$, $2);
     addTreeNodeChild($$, $3);
+    addTreeNodeChild($$, $4);
 }
 | ID LP RP{
     $$ = createTreeNode("Exp", NULL, TYPE_NONTERMINAL, @$.first_line);
@@ -470,6 +474,7 @@ Exp: Exp ASSIGNOP Exp{
     addTreeNodeChild($$, $1);
     addTreeNodeChild($$, $2);
     addTreeNodeChild($$, $3);
+    addTreeNodeChild($$, $4);
 }
 | Exp DOT ID{
     $$ = createTreeNode("Exp", NULL, TYPE_NONTERMINAL, @$.first_line);
