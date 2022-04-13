@@ -16,7 +16,9 @@ void InitSymbolTable (){
 int InsertSymbol (Type symbolType, char* symbolName){
     unsigned int hashValue = Hash (symbolName);
 
-    if(SearchSymbol(symbolName) == 1) return 0;
+    if(SearchSymbol(symbolName) != NULL) {
+        return -1;
+    }
 
     SymbolNode newNode = (SymbolNode) malloc (sizeof(struct SymbolNode_));
     if(newNode == NULL){
@@ -51,23 +53,23 @@ int DeleteSymbol (char* symbolName){
     return 0;
 }
 
-int SearchSymbol(char* symbolName){
+SymbolNode SearchSymbol(char* symbolName){
     unsigned int hashValue = Hash (symbolName);
 
     SymbolNode tmp = symbolTable[hashValue].firstSymbolNode;
     if(tmp == NULL){
-        return 0;
+        return NULL;
     }
     if(strcmp(tmp->sName, symbolName) == 0) {
-        return 1;
+        return tmp;
     }
     while(tmp->nextSymbolNode != NULL){
         if(strcmp(tmp->nextSymbolNode->sName, symbolName) == 0){
-            return 1;
+            return tmp->nextSymbolNode;
         }
         tmp = tmp->nextSymbolNode;
     }
-    return 0;
+    return NULL;
 }
 
 unsigned int Hash (char* name) {

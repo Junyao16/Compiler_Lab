@@ -7,7 +7,10 @@
 extern FILE* yyin;
 extern struct TreeNode* treeRoot;
 extern int haveError;
-extern struct HashNode symbolTable[];
+
+extern int yyrestart(FILE*);
+extern int yyparse();
+int yylex();
 
 int main(int argc, char** argv)
 {
@@ -21,7 +24,7 @@ int main(int argc, char** argv)
     yyrestart(f);
     yyparse();
 
-    if(!haveError) printTree(treeRoot, 0);
+    if(!haveError) semanticAnalyzer();
 
 
     return 0;

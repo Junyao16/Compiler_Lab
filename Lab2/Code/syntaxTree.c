@@ -1,4 +1,5 @@
 #include "syntaxTree.h"
+#include <stdlib.h>
 
 struct TreeNode* createTreeNode(char* name, char* value, enum TYPE_NODE type, int row){
     struct TreeNode* newNode = (struct TreeNode*)malloc(sizeof(struct TreeNode));
