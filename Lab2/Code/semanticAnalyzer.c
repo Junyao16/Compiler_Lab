@@ -115,7 +115,7 @@ Type StructSpecifier (struct TreeNode* curNode) {
                             type->u.structure.fieldlist = DefList(curNode->firstChild->nextSibling->nextSibling->nextSibling, 1);
                             if(InsertFieldList(type->u.structure.fieldlist) == 0){
                                 return NULL;
-                            }                            
+                            }
                         }
                     }
                     if(type->kind == STRUCT_NAME){
@@ -176,6 +176,9 @@ char* Tag (struct TreeNode* curNode){
 // | VarDec LB INT RB
 FieldList VarDec (struct TreeNode* curNode, Type type, int IsStruct){
     if(curNode != NULL && strcmp(curNode->nodeName, "VarDec") == 0){
+        if(type == NULL){
+            return NULL;
+        }
         FieldList fieldlist = (FieldList)malloc(sizeof(struct FieldList_));
         if(curNode->firstChild != NULL){
             if(strcmp(curNode->firstChild->nodeName, "ID") == 0){
@@ -253,6 +256,7 @@ FieldList VarList (struct TreeNode* curNode){
                     else fieldlist = VarList(curNode->firstChild->nextSibling->nextSibling);
                 }
             }
+            return fieldlist;
         }
     }
     return NULL;
@@ -264,6 +268,9 @@ FieldList ParamDec (struct TreeNode* curNode){
     if(curNode != NULL && strcmp(curNode->nodeName, "ParamDec") == 0){
         if(curNode->firstChild != NULL && strcmp(curNode->firstChild->nodeName, "Specifier") == 0){
             Type type = Specifier(curNode->firstChild);
+            if(type == NULL){
+                return NULL;
+            }
             if (curNode->firstChild->nextSibling != NULL && strcmp(curNode->firstChild->nextSibling->nodeName, "VarDec") == 0){
                 FieldList fieldlist = VarDec(curNode->firstChild->nextSibling, type, 0);
                 return fieldlist;
@@ -279,7 +286,7 @@ void CompSt (struct TreeNode* curNode, Type retType){
     if(curNode != NULL && strcmp(curNode->nodeName, "CompSt") == 0){
         if(curNode->firstChild != NULL && strcmp(curNode->firstChild->nodeName, "LC") == 0){
             if(curNode->firstChild->nextSibling != NULL && strcmp(curNode->firstChild->nextSibling->nodeName, "DefList") == 0){
-                FieldList fieldlist = DefList(curNode->firstChild->nextSibling, 0);
+                DefList(curNode->firstChild->nextSibling, 0);
                 if (curNode->firstChild->nextSibling->nextSibling != NULL && strcmp(curNode->firstChild->nextSibling->nextSibling->nodeName, "StmtList") == 0){
                     StmtList(curNode->firstChild->nextSibling->nextSibling, retType);
                 }
@@ -389,6 +396,9 @@ FieldList Def (struct TreeNode* curNode, int IsStruct){
         FieldList fieldlist = (FieldList)malloc(sizeof(struct FieldList_));
         if(curNode->firstChild != NULL && strcmp(curNode->firstChild->nodeName, "Specifier") == 0){
             Type type = Specifier(curNode->firstChild);
+            if(type == NULL){
+                return NULL;
+            }
             if (curNode->firstChild->nextSibling != NULL && strcmp(curNode->firstChild->nextSibling->nodeName, "DecList") == 0){
                 fieldlist = DecList(curNode->firstChild->nextSibling, type, IsStruct);
             }
@@ -425,9 +435,13 @@ FieldList Dec (struct TreeNode* curNode, Type type, int IsStruct){
         FieldList fieldlist = (FieldList)malloc(sizeof(struct FieldList_));
         if(curNode->firstChild != NULL && strcmp(curNode->firstChild->nodeName, "VarDec") == 0){
             fieldlist = VarDec(curNode->firstChild, type, IsStruct);
+            if(fieldlist == NULL){
+                return NULL;
+            }
             if (curNode->firstChild->nextSibling != NULL && strcmp(curNode->firstChild->nextSibling->nodeName, "ASSIGNOP") == 0){
                 if(IsStruct == 1){
                     ErrorOut(15, curNode->firstChild->nextSibling->nodeRow, curNode->firstChild->nextSibling->nodeValue.stringValue);
+                    return NULL;
                 }
                 if (curNode->firstChild->nextSibling->nextSibling != NULL && strcmp(curNode->firstChild->nextSibling->nextSibling->nodeName, "Exp") == 0){
                     if(CompareType(fieldlist->type, Exp(curNode->firstChild->nextSibling->nextSibling)) == 0){
@@ -464,12 +478,12 @@ Type Exp (struct TreeNode* curNode){
         if(curNode->firstChild != NULL){
             if(strcmp(curNode->firstChild->nodeName, "Exp") == 0){
                 Type type1 = Exp(curNode->firstChild);
-                if(type1 == NULL){
-                    return NULL;
-                }
                 if (curNode->firstChild->nextSibling != NULL && strcmp(curNode->firstChild->nextSibling->nodeName, "ASSIGNOP") == 0){
                     if (curNode->firstChild->nextSibling->nextSibling != NULL && strcmp(curNode->firstChild->nextSibling->nextSibling->nodeName, "Exp") == 0){
                         Type type2 = Exp(curNode->firstChild->nextSibling->nextSibling);
+                        if(type1 == NULL){
+                            return NULL;
+                        }
                         if(type2 == NULL){
                             return NULL;
                         }
@@ -502,6 +516,9 @@ Type Exp (struct TreeNode* curNode){
                 else if (curNode->firstChild->nextSibling != NULL && strcmp(curNode->firstChild->nextSibling->nodeName, "AND") == 0){
                     if (curNode->firstChild->nextSibling->nextSibling != NULL && strcmp(curNode->firstChild->nextSibling->nextSibling->nodeName, "Exp") == 0){
                         Type type2 = Exp(curNode->firstChild->nextSibling->nextSibling);
+                        if(type1 == NULL){
+                            return NULL;
+                        }
                         if(type2 == NULL){
                             return NULL;
                         }
@@ -517,6 +534,9 @@ Type Exp (struct TreeNode* curNode){
                 else if (curNode->firstChild->nextSibling != NULL && strcmp(curNode->firstChild->nextSibling->nodeName, "OR") == 0){
                     if (curNode->firstChild->nextSibling->nextSibling != NULL && strcmp(curNode->firstChild->nextSibling->nextSibling->nodeName, "Exp") == 0){
                         Type type2 = Exp(curNode->firstChild->nextSibling->nextSibling);
+                        if(type1 == NULL){
+                            return NULL;
+                        }
                         if(type2 == NULL){
                             return NULL;
                         }
@@ -532,6 +552,9 @@ Type Exp (struct TreeNode* curNode){
                 else if (curNode->firstChild->nextSibling != NULL && strcmp(curNode->firstChild->nextSibling->nodeName, "RELOP") == 0){
                     if (curNode->firstChild->nextSibling->nextSibling != NULL && strcmp(curNode->firstChild->nextSibling->nextSibling->nodeName, "Exp") == 0){
                         Type type2 = Exp(curNode->firstChild->nextSibling->nextSibling);
+                        if(type1 == NULL){
+                            return NULL;
+                        }
                         if(type2 == NULL){
                             return NULL;
                         }
@@ -550,6 +573,9 @@ Type Exp (struct TreeNode* curNode){
                 else if (curNode->firstChild->nextSibling != NULL && strcmp(curNode->firstChild->nextSibling->nodeName, "PLUS") == 0){
                     if (curNode->firstChild->nextSibling->nextSibling != NULL && strcmp(curNode->firstChild->nextSibling->nextSibling->nodeName, "Exp") == 0){
                         Type type2 = Exp(curNode->firstChild->nextSibling->nextSibling);
+                        if(type1 == NULL){
+                            return NULL;
+                        }
                         if(type2 == NULL){
                             return NULL;
                         }
@@ -565,6 +591,9 @@ Type Exp (struct TreeNode* curNode){
                 else if (curNode->firstChild->nextSibling != NULL && strcmp(curNode->firstChild->nextSibling->nodeName, "MINUS") == 0){
                     if (curNode->firstChild->nextSibling->nextSibling != NULL && strcmp(curNode->firstChild->nextSibling->nextSibling->nodeName, "Exp") == 0){
                         Type type2 = Exp(curNode->firstChild->nextSibling->nextSibling);
+                        if(type1 == NULL){
+                            return NULL;
+                        }
                         if(type2 == NULL){
                             return NULL;
                         }
@@ -580,6 +609,9 @@ Type Exp (struct TreeNode* curNode){
                 else if (curNode->firstChild->nextSibling != NULL && strcmp(curNode->firstChild->nextSibling->nodeName, "STAR") == 0){
                     if (curNode->firstChild->nextSibling->nextSibling != NULL && strcmp(curNode->firstChild->nextSibling->nextSibling->nodeName, "Exp") == 0){
                         Type type2 = Exp(curNode->firstChild->nextSibling->nextSibling);
+                        if(type1 == NULL){
+                            return NULL;
+                        }
                         if(type2 == NULL){
                             return NULL;
                         }
@@ -595,6 +627,9 @@ Type Exp (struct TreeNode* curNode){
                 else if (curNode->firstChild->nextSibling != NULL && strcmp(curNode->firstChild->nextSibling->nodeName, "DIV") == 0){
                     if (curNode->firstChild->nextSibling->nextSibling != NULL && strcmp(curNode->firstChild->nextSibling->nextSibling->nodeName, "Exp") == 0){
                         Type type2 = Exp(curNode->firstChild->nextSibling->nextSibling);
+                        if(type1 == NULL){
+                            return NULL;
+                        }
                         if(type2 == NULL){
                             return NULL;
                         }
@@ -610,6 +645,9 @@ Type Exp (struct TreeNode* curNode){
                 else if (curNode->firstChild->nextSibling != NULL && strcmp(curNode->firstChild->nextSibling->nodeName, "LB") == 0){
                     if (curNode->firstChild->nextSibling->nextSibling != NULL && strcmp(curNode->firstChild->nextSibling->nextSibling->nodeName, "Exp") == 0){
                         Type type2 = Exp(curNode->firstChild->nextSibling->nextSibling);
+                        if(type1 == NULL){
+                            return NULL;
+                        }
                         if(type2 == NULL){
                             return NULL;
                         }
@@ -628,6 +666,9 @@ Type Exp (struct TreeNode* curNode){
                 }
                 else if (curNode->firstChild->nextSibling != NULL && strcmp(curNode->firstChild->nextSibling->nodeName, "DOT") == 0){
                     if (curNode->firstChild->nextSibling->nextSibling != NULL && strcmp(curNode->firstChild->nextSibling->nextSibling->nodeName, "ID") == 0){
+                        if(type1 == NULL){
+                            return NULL;
+                        }
                         if(type1->kind == FUNCTION) type1 = type1->u.function.returnType;
                         if(type1->kind != STRUCTURE){
                             ErrorOut(13, curNode->firstChild->nextSibling->nodeRow, NULL);
@@ -847,7 +888,7 @@ int CompareFieldList(FieldList fieldlist1, FieldList fieldlist2){
 
 int InsertFieldList(FieldList fieldlist){
     int error = 0;
-    FieldList tmp = fieldlist -> tail;
+    FieldList tmp = fieldlist;
     FieldList tmp1 = fieldlist;
     while(tmp != NULL){
         tmp1 = fieldlist;
@@ -860,7 +901,12 @@ int InsertFieldList(FieldList fieldlist){
             tmp1 = tmp1->tail;
         }
         if(tmp->type->kind == STRUCTURE){
-            InsertFieldList(tmp->type->u.structure.fieldlist);
+            if(InsertFieldList(tmp->type->u.structure.fieldlist) == 0){
+                error = 1;
+            }
+            if(SearchSymbol(tmp->name) == 0){
+                InsertSymbol(tmp->type, tmp->name);
+            }
         }
         else{
             if(SearchSymbol(tmp->name) == 0){
@@ -870,6 +916,7 @@ int InsertFieldList(FieldList fieldlist){
                 error = 1;
             }
         }
+        //printf("%s\n", tmp->name);
         tmp = tmp -> tail;
     }
     if(error == 1) return 0;
