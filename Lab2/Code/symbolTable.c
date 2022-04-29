@@ -15,6 +15,7 @@ void InitSymbolTable (){
 
 int InsertSymbol (Type symbolType, char* symbolName){
     unsigned int hashValue = Hash (symbolName);
+    //printf("Insert %s\n", symbolName);
 
     if(SearchSymbol(symbolName) != NULL) {
         return -1;
@@ -28,7 +29,6 @@ int InsertSymbol (Type symbolType, char* symbolName){
     strcpy(newNode->sName, symbolName);
     newNode->nextSymbolNode = symbolTable[hashValue].firstSymbolNode;
     symbolTable[hashValue].firstSymbolNode = newNode;
-
     return 1;
 }
 

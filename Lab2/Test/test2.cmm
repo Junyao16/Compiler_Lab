@@ -1,40 +1,17 @@
-int main() {
-  bin2dec(1001001);
-  dec2bin(1234567);
-}
+struct Temp1
+ {
+int i;
+ float j;
+ };
 
-int rem(int a, int b) {
-  return a - a / b * b;
-}
+ struct Temp2
+ {
+ int x;
+ };
 
-int bin2dec(int n) {
-  int dec = 0, i = 0, rem;
-  while (n != 0) {
-    rem = rem(n, 10);
-    n = n / 10;
-    dec = dec + rem * pow(2, i);
-    i = i + 1;
-  }
-  return dec;
-}
-
-int dec2bin(int m) {
-  if (n <= 1)
-    return n;
-  else {
-    dec2bin(n / 2);
-    write(rem(n, 2));
-  }
-}
-
-int cal() {
-  int z_x = 0;
-  while (1 * 2 + (2 - 3 * 4 )) {
-    if (a > b)
-      dec2bin(a);
-    else {
-      z_x = x / (y * y - z);
-      bin2dec(b);
-    }
-  }
-}
+ int main()
+ {
+ struct Temp1 t1;
+ struct Temp2 t2;
+ t1 = t2;
+ }

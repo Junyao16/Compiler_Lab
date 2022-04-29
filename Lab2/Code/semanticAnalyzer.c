@@ -103,7 +103,7 @@ Type StructSpecifier (struct TreeNode* curNode) {
                 if(strcmp(curNode->firstChild->nextSibling->nodeName, "OptTag") == 0){
                     Type type = (Type)malloc(sizeof(struct Type_));
                     strcpy(type->u.structure.structName, OptTag(curNode->firstChild->nextSibling));
-                    if(type->u.structure.structName == "\0"){
+                    if(type->u.structure.structName == "\0" || type->u.structure.structName == NULL){
                         type->kind = STRUCTURE;
                     }
                     else{
@@ -138,6 +138,18 @@ Type StructSpecifier (struct TreeNode* curNode) {
                         //TODO: structure fieldlist copy
                         return type;
                     }
+                }
+                else if(strcmp(curNode->firstChild->nextSibling->nodeName, "LC") == 0){
+                    Type type = (Type)malloc(sizeof(struct Type_));
+                    type->kind = STRUCTURE;
+                    type->u.structure.fieldlist = NULL;
+                    if(curNode->firstChild->nextSibling->nextSibling != NULL){
+                        type->u.structure.fieldlist = DefList(curNode->firstChild->nextSibling->nextSibling, 1);
+                        if(InsertFieldList(type->u.structure.fieldlist) == 0){
+                            return NULL;
+                        }
+                    }
+                    return type;
                 }
             }
         }
@@ -332,7 +344,7 @@ void Stmt (struct TreeNode* curNode, Type retType){
             }
             else if(strcmp(curNode->firstChild->nodeName, "RETURN") == 0){
                 if(curNode->firstChild->nextSibling != NULL && strcmp(curNode->firstChild->nextSibling->nodeName, "Exp") == 0){
-                    if(CompareType(Exp(curNode->firstChild->nextSibling), retType) != 1){
+                    if(CompareType(retType, Exp(curNode->firstChild->nextSibling)) != 1){
                         ErrorOut(8, curNode->firstChild->nextSibling->nodeRow, NULL);
                     }
                 }
@@ -378,8 +390,14 @@ FieldList DefList (struct TreeNode* curNode, int IsStruct){
         if(curNode->firstChild != NULL && strcmp(curNode->firstChild->nodeName, "Def") == 0){
             FieldList fieldlist = Def(curNode->firstChild, IsStruct);
             if (curNode->firstChild->nextSibling != NULL && strcmp(curNode->firstChild->nextSibling->nodeName, "DefList") == 0){
-                if(fieldlist != NULL) fieldlist->tail = DefList(curNode->firstChild->nextSibling, IsStruct);
-                else fieldlist = DefList(curNode->firstChild->nextSibling, IsStruct);
+                FieldList tmp = fieldlist;
+                if(tmp == NULL) fieldlist = DefList(curNode->firstChild->nextSibling, IsStruct);
+                else{
+                    while(tmp->tail != NULL){
+                        tmp = tmp ->tail;
+                    }
+                    tmp->tail = DefList(curNode->firstChild->nextSibling, IsStruct);
+                }
             }
             return fieldlist;
         }
@@ -487,13 +505,6 @@ Type Exp (struct TreeNode* curNode){
                         if(type2 == NULL){
                             return NULL;
                         }
-                        if(CompareType(type1, type2) == 0){
-                            ErrorOut(5, curNode->firstChild->nextSibling->nodeRow, NULL);
-                            return NULL;
-                        }
-                        else if(CompareType(type1, type2) == -1){
-                            return NULL;
-                        }
                         if(strcmp(curNode->firstChild->firstChild->nodeName, "ID") == 0 && curNode->firstChild->firstChild->nextSibling == NULL){
 
                         }
@@ -508,6 +519,13 @@ Type Exp (struct TreeNode* curNode){
                         }
                         else{
                             ErrorOut(6, curNode->firstChild->nextSibling->nodeRow, NULL);
+                            return NULL;
+                        }
+                        if(CompareType(type1, type2) == 0){
+                            ErrorOut(5, curNode->firstChild->nextSibling->nodeRow, NULL);
+                            return NULL;
+                        }
+                        else if(CompareType(type1, type2) == -1){
                             return NULL;
                         }
                         return type1;
@@ -670,7 +688,7 @@ Type Exp (struct TreeNode* curNode){
                             return NULL;
                         }
                         if(type1->kind == FUNCTION) type1 = type1->u.function.returnType;
-                        if(type1->kind != STRUCTURE){
+                        if(type1->kind != STRUCTURE && type1->kind != STRUCT_NAME){
                             ErrorOut(13, curNode->firstChild->nextSibling->nodeRow, NULL);
                         }
                         else{
@@ -776,7 +794,7 @@ int Args (struct TreeNode* curNode, FieldList fieldlist){
             if(fieldlist == NULL){
                 return 0;
             }
-            if(fieldlist != NULL && CompareType(Exp(curNode->firstChild), fieldlist->type) != 1) {
+            if(fieldlist != NULL && CompareType(fieldlist->type, Exp(curNode->firstChild)) != 1) {
                 return 0;
             }
             if (curNode->firstChild->nextSibling != NULL && strcmp(curNode->firstChild->nextSibling->nodeName, "COMMA") == 0){
@@ -856,15 +874,27 @@ int CompareType(Type type1, Type type2){
         if(type2->kind == FUNCTION){
             if(CompareType(type1, type2->u.function.returnType) == 1) return 1;
         }
+        if(type1->kind == FUNCTION){
+            if(CompareType(type2, type1->u.function.returnType) == 1) return 1;
+        }
+        if(type1->kind == STRUCT_NAME && type2->kind == STRUCTURE){
+            if(strcmp(type1->u.structure.structName, type2->u.structure.structName) == 0) return 1;
+            if(CompareFieldList(type1->u.structure.fieldlist, type2->u.structure.fieldlist) == 1) return 1;
+        }
+        if(type2->kind == STRUCT_NAME && type1->kind == STRUCTURE){
+            if(strcmp(type1->u.structure.structName, type2->u.structure.structName) == 0) return 1;
+            if(CompareFieldList(type1->u.structure.fieldlist, type2->u.structure.fieldlist) == 1) return 1;
+        }
         return 0;
     } 
     if(type1->kind == BASIC){
         if(type1->u.basic == type2->u.basic) return 1;
     }
     else if(type1->kind == ARRAY){
-        if(type1->u.array.size == type2->u.array.size && CompareType(type1->u.array.elem, type2->u.array.elem) == 1) return 1;
+        if(CompareType(type1->u.array.elem, type2->u.array.elem) == 1) return 1;
     }
     else if(type1->kind == STRUCTURE){
+        if(strcmp(type1->u.structure.structName, type2->u.structure.structName) == 0) return 1;
         if(CompareFieldList(type1->u.structure.fieldlist, type2->u.structure.fieldlist) == 1) return 1;
     }
     else if(type1->kind == FUNCTION){
@@ -874,7 +904,7 @@ int CompareType(Type type1, Type type2){
 }
 
 int CompareFieldList(FieldList fieldlist1, FieldList fieldlist2){
-    if(fieldlist1 == NULL || fieldlist2 == NULL) return 0;
+    if((fieldlist1 == NULL || fieldlist2 == NULL) && fieldlist1 != fieldlist2) return 0;
     FieldList tmp1 = fieldlist1;
     FieldList tmp2 = fieldlist2;
     while(tmp1 != NULL && tmp2 != NULL){
@@ -900,7 +930,7 @@ int InsertFieldList(FieldList fieldlist){
             }
             tmp1 = tmp1->tail;
         }
-        if(tmp->type->kind == STRUCTURE){
+        if(tmp->type->kind == STRUCT_NAME){
             if(InsertFieldList(tmp->type->u.structure.fieldlist) == 0){
                 error = 1;
             }
@@ -916,7 +946,7 @@ int InsertFieldList(FieldList fieldlist){
                 error = 1;
             }
         }
-        //printf("%s\n", tmp->name);
+        //if(error == 1) printf("%s %s\n", tmp->name, tmp1->name);
         tmp = tmp -> tail;
     }
     if(error == 1) return 0;
