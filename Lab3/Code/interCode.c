@@ -736,11 +736,21 @@ Operand translate_Exp(struct TreeNode *curNode)
                                 InsertInterCode(newInterCode);
                                 newInterCode = CreateInterCode(IC_ASG_CONTENT, newAddr, newOp2, NULL, NULL);
                                 InsertInterCode(newInterCode);
-                                Operand newOp = CreateOperand(OP_TMPVAR, -1, NULL, NULL);
-                                newInterCode = CreateInterCode(IC_GET_CONTENT, newOp, newAddr, NULL, NULL);
-                                InsertInterCode(newInterCode);
-                                strcpy(newOp->varName, newOp1->varName);
-                                return newOp;
+
+                                SymbolNode symbolnode = SearchSymbol(newOp1->varName);
+                                if (symbolnode->type->u.array.elem->kind == BASIC)
+                                {
+                                    Operand newOp = CreateOperand(OP_TMPVAR, -1, NULL, NULL);
+                                    newInterCode = CreateInterCode(IC_GET_CONTENT, newOp, newAddr, NULL, NULL);
+                                    InsertInterCode(newInterCode);
+                                    strcpy(newOp->varName, symbolnode->sName);
+                                    return newOp;
+                                }
+                                else
+                                {
+                                    strcpy(newAddr->varName, symbolnode->type->u.array.elem->u.structure.structName);
+                                    return newAddr;
+                                }
                             }
                             if (strcmp(curNode->firstChild->firstChild->nextSibling->nodeName, "DOT") == 0)
                             {
@@ -773,11 +783,20 @@ Operand translate_Exp(struct TreeNode *curNode)
                                 InsertInterCode(newInterCode);
                                 newInterCode = CreateInterCode(IC_ASG_CONTENT, newAddr, newOp2, NULL, NULL);
                                 InsertInterCode(newInterCode);
-                                Operand newOp = CreateOperand(OP_TMPVAR, -1, NULL, NULL);
-                                newInterCode = CreateInterCode(IC_GET_CONTENT, newOp, newAddr, NULL, NULL);
-                                InsertInterCode(newInterCode);
-                                strcpy(newOp->varName, newOp1->varName);
-                                return newOp;
+
+                                if (symbolnode->type->kind == BASIC)
+                                {
+                                    Operand newOp = CreateOperand(OP_TMPVAR, -1, NULL, NULL);
+                                    newInterCode = CreateInterCode(IC_GET_CONTENT, newOp, newAddr, NULL, NULL);
+                                    InsertInterCode(newInterCode);
+                                    strcpy(newOp->varName, symbolnode->sName);
+                                    return newOp;
+                                }
+                                else
+                                {
+                                    strcpy(newAddr->varName, symbolnode->sName);
+                                    return newAddr;
+                                }
                             }
                         }
                     }
@@ -908,11 +927,21 @@ Operand translate_Exp(struct TreeNode *curNode)
                         InsertInterCode(newInterCode);
                         newInterCode = CreateInterCode(IC_ADD, newAddr, newOff, newAddr, NULL);
                         InsertInterCode(newInterCode);
-                        Operand newOp = CreateOperand(OP_TMPVAR, -1, NULL, NULL);
-                        newInterCode = CreateInterCode(IC_GET_CONTENT, newOp, newAddr, NULL, NULL);
-                        InsertInterCode(newInterCode);
-                        strcpy(newOp->varName, newOp1->varName);
-                        return newOp;
+
+                        SymbolNode symbolnode = SearchSymbol(newOp1->varName);
+                        if (symbolnode->type->u.array.elem->kind == BASIC)
+                        {
+                            Operand newOp = CreateOperand(OP_TMPVAR, -1, NULL, NULL);
+                            newInterCode = CreateInterCode(IC_GET_CONTENT, newOp, newAddr, NULL, NULL);
+                            InsertInterCode(newInterCode);
+                            strcpy(newOp->varName, symbolnode->sName);
+                            return newOp;
+                        }
+                        else
+                        {
+                            strcpy(newAddr->varName, symbolnode->type->u.array.elem->u.structure.structName);
+                            return newAddr;
+                        }
                     }
                 }
                 else if (curNode->firstChild->nextSibling != NULL && strcmp(curNode->firstChild->nextSibling->nodeName, "DOT") == 0)
@@ -947,11 +976,20 @@ Operand translate_Exp(struct TreeNode *curNode)
                         Operand newOff = CreateOperand(OP_CONSTANT, offset, NULL, NULL);
                         newInterCode = CreateInterCode(IC_ADD, newAddr, newOff, newAddr, NULL);
                         InsertInterCode(newInterCode);
-                        Operand newOp = CreateOperand(OP_TMPVAR, -1, NULL, NULL);
-                        newInterCode = CreateInterCode(IC_GET_CONTENT, newOp, newAddr, NULL, NULL);
-                        InsertInterCode(newInterCode);
-                        strcpy(newOp->varName, newOp1->varName);
-                        return newOp;
+
+                        if (symbolnode->type->kind == BASIC)
+                        {
+                            Operand newOp = CreateOperand(OP_TMPVAR, -1, NULL, NULL);
+                            newInterCode = CreateInterCode(IC_GET_CONTENT, newOp, newAddr, NULL, NULL);
+                            InsertInterCode(newInterCode);
+                            strcpy(newOp->varName, symbolnode->sName);
+                            return newOp;
+                        }
+                        else
+                        {
+                            strcpy(newAddr->varName, symbolnode->sName);
+                            return newAddr;
+                        }
                     }
                 }
             }

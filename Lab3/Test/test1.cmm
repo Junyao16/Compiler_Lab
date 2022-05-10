@@ -3,6 +3,12 @@ struct Operands
 int o1;
 int o2;
 };
+
+struct Operands1
+{
+struct Operands a[10];
+};
+
 int add(struct Operands temp)
 {
 return (temp.o1 + temp.o2);
@@ -10,10 +16,9 @@ return (temp.o1 + temp.o2);
 int main()
 {
 int n;
-struct Operands op;
-op.o1 = 1;
-op.o2 = 2;
-n = add(op);
-write(n);
+struct Operands1 op;
+op.a[0].o1 = 1;
+op.a[5].o2 = 2;
+write(op.a[0].o1);
 return 0;
 }
