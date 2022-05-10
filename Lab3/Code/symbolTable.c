@@ -36,6 +36,7 @@ int InsertSymbol(Type symbolType, char *symbolName)
     strcpy(newNode->sName, symbolName);
     newNode->nextSymbolNode = symbolTable[hashValue].firstSymbolNode;
     newNode->var_no = -1;
+    newNode->isAddrParam = 0;
     symbolTable[hashValue].firstSymbolNode = newNode;
     return 1;
 }
@@ -130,4 +131,28 @@ void CreateWriteFunction()
     type->u.function.paraList = fieldlist;
     type->u.function.returnType = retType;
     InsertSymbol(type, "write");
+}
+
+int GetSize(Type type)
+{
+    if (type->kind == BASIC)
+    {
+        return 4;
+    }
+    else if (type->kind == ARRAY)
+    {
+        return GetSize(type->u.array.elem) * type->u.array.size;
+    }
+    else if (type->kind == STRUCTURE || type->kind == STRUCT_NAME)
+    {
+        FieldList fieldlist = type->u.structure.fieldlist;
+        int curSize = 0;
+        while (fieldlist != NULL)
+        {
+            curSize += GetSize(fieldlist->type);
+            fieldlist = fieldlist->tail;
+        }
+        return curSize;
+    }
+    return 0;
 }

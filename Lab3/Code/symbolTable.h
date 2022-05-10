@@ -58,6 +58,7 @@ struct SymbolNode_
 
     int var_no;
     int offset;
+    int isAddrParam;
 
     SymbolNode nextSymbolNode;
 };
@@ -79,5 +80,7 @@ unsigned int Hash(char *name);
 
 void CreateReadFunction();
 void CreateWriteFunction();
+
+int GetSize(Type type);
 
 #endif

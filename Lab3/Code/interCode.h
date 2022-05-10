@@ -6,6 +6,8 @@
 
 extern struct TreeNode *treeRoot;
 
+extern int haveError;
+
 typedef struct Operand_ *Operand;
 
 struct Operand_
@@ -26,6 +28,7 @@ struct Operand_
         int value;
         char funName[32];
     } u;
+    char varName[32];
 };
 
 struct InterCode
@@ -85,7 +88,7 @@ void PrintOp(Operand op, FILE *fout);
 
 void PrintInterCodes(FILE *fout);
 
-Operand CreateOperand(int kind, int val, char *funName);
+Operand CreateOperand(int kind, int val, char *funName, char *varName);
 
 struct InterCodes *CreateInterCode(int kind, Operand op1, Operand op2, Operand result, char *relop);
 
@@ -106,20 +109,22 @@ void translate_CompSt(struct TreeNode *curNode);
 
 void translate_StmtList(struct TreeNode *curNode);
 
-struct InterCodes *translate_Stmt(struct TreeNode *curNode);
+void translate_Stmt(struct TreeNode *curNode);
 
 void translate_DefList(struct TreeNode *curNode);
 
-struct InterCodes *translate_Def(struct TreeNode *curNode);
+void translate_Def(struct TreeNode *curNode);
 
-struct InterCodes *translate_DecList(struct TreeNode *curNode);
+void translate_DecList(struct TreeNode *curNode);
 
-struct InterCodes *translate_Dec(struct TreeNode *curNode);
+void translate_Dec(struct TreeNode *curNode);
 
 Operand translate_Exp(struct TreeNode *curNode);
 
 void translate_Args(struct TreeNode *curNode);
 
 void translate_Cond(struct TreeNode *curNode, Operand label_true, Operand label_false);
+
+void ErrorOutIC();
 
 #endif

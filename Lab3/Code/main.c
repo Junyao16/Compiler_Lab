@@ -32,17 +32,19 @@ int main(int argc, char **argv)
 
     if (!haveError)
     {
+        GenerateInterCode();
+    }
+    if (!haveError)
+    {
         FILE *fout = fopen(argv[2], "w+");
         if (fout == NULL)
         {
             perror(argv[2]);
             return 1;
         }
-        GenerateInterCode();
         PrintInterCodes(fout);
         fclose(fout);
     }
-
     fclose(f);
 
     return 0;
