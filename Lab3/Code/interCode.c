@@ -727,12 +727,10 @@ Operand translate_Exp(struct TreeNode *curNode)
                                 Operand newOp3 = translate_Exp(curNode->firstChild->firstChild->nextSibling->nextSibling);
                                 Operand newConstant = CreateOperand(OP_CONSTANT, GetSize(SearchSymbol(newOp1->varName)->type->u.array.elem), NULL, NULL);
                                 Operand newAddr = CreateOperand(OP_TMPVAR, -1, NULL, NULL);
-                                struct InterCodes *newInterCode = CreateInterCode(IC_ASSIGN, newAddr, newOp1, NULL, NULL);
-                                InsertInterCode(newInterCode);
                                 Operand newOff = CreateOperand(OP_TMPVAR, -1, NULL, NULL);
-                                newInterCode = CreateInterCode(IC_MUL, newConstant, newOp3, newOff, NULL);
+                                struct InterCodes *newInterCode = CreateInterCode(IC_MUL, newConstant, newOp3, newOff, NULL);
                                 InsertInterCode(newInterCode);
-                                newInterCode = CreateInterCode(IC_ADD, newAddr, newOff, newAddr, NULL);
+                                newInterCode = CreateInterCode(IC_ADD, newOp1, newOff, newAddr, NULL);
                                 InsertInterCode(newInterCode);
                                 newInterCode = CreateInterCode(IC_ASG_CONTENT, newAddr, newOp2, NULL, NULL);
                                 InsertInterCode(newInterCode);
@@ -740,11 +738,12 @@ Operand translate_Exp(struct TreeNode *curNode)
                                 SymbolNode symbolnode = SearchSymbol(newOp1->varName);
                                 if (symbolnode->type->u.array.elem->kind == BASIC)
                                 {
-                                    Operand newOp = CreateOperand(OP_TMPVAR, -1, NULL, NULL);
-                                    newInterCode = CreateInterCode(IC_GET_CONTENT, newOp, newAddr, NULL, NULL);
-                                    InsertInterCode(newInterCode);
-                                    strcpy(newOp->varName, symbolnode->sName);
-                                    return newOp;
+                                    return newOp2;
+                                    // Operand newOp = CreateOperand(OP_TMPVAR, -1, NULL, NULL);
+                                    // newInterCode = CreateInterCode(IC_GET_CONTENT, newOp, newAddr, NULL, NULL);
+                                    // InsertInterCode(newInterCode);
+                                    // strcpy(newOp->varName, symbolnode->sName);
+                                    // return newOp;
                                 }
                                 else
                                 {
@@ -768,9 +767,6 @@ Operand translate_Exp(struct TreeNode *curNode)
                                 var_count--;
                                 newOp3->u.var_no = symbolnode->var_no;
 
-                                Operand newAddr = CreateOperand(OP_TMPVAR, -1, NULL, NULL);
-                                struct InterCodes *newInterCode = CreateInterCode(IC_ASSIGN, newAddr, newOp1, NULL, NULL);
-                                InsertInterCode(newInterCode);
                                 int offset = 0;
                                 FieldList fieldlist = SearchSymbol(newOp1->varName)->type->u.structure.fieldlist;
                                 while (fieldlist != NULL && strcmp(fieldlist->name, newOp3->varName) != 0)
@@ -779,18 +775,20 @@ Operand translate_Exp(struct TreeNode *curNode)
                                     fieldlist = fieldlist->tail;
                                 }
                                 Operand newOff = CreateOperand(OP_CONSTANT, offset, NULL, NULL);
-                                newInterCode = CreateInterCode(IC_ADD, newAddr, newOff, newAddr, NULL);
+                                Operand newAddr = CreateOperand(OP_TMPVAR, -1, NULL, NULL);
+                                struct InterCodes *newInterCode = CreateInterCode(IC_ADD, newOp1, newOff, newAddr, NULL);
                                 InsertInterCode(newInterCode);
                                 newInterCode = CreateInterCode(IC_ASG_CONTENT, newAddr, newOp2, NULL, NULL);
                                 InsertInterCode(newInterCode);
 
                                 if (symbolnode->type->kind == BASIC)
                                 {
-                                    Operand newOp = CreateOperand(OP_TMPVAR, -1, NULL, NULL);
-                                    newInterCode = CreateInterCode(IC_GET_CONTENT, newOp, newAddr, NULL, NULL);
-                                    InsertInterCode(newInterCode);
-                                    strcpy(newOp->varName, symbolnode->sName);
-                                    return newOp;
+                                    return newOp2;
+                                    // Operand newOp = CreateOperand(OP_TMPVAR, -1, NULL, NULL);
+                                    // newInterCode = CreateInterCode(IC_GET_CONTENT, newOp, newAddr, NULL, NULL);
+                                    // InsertInterCode(newInterCode);
+                                    // strcpy(newOp->varName, symbolnode->sName);
+                                    // return newOp;
                                 }
                                 else
                                 {
@@ -920,12 +918,10 @@ Operand translate_Exp(struct TreeNode *curNode)
                         Operand newOp2 = translate_Exp(curNode->firstChild->nextSibling->nextSibling);
                         Operand newConstant = CreateOperand(OP_CONSTANT, GetSize(SearchSymbol(newOp1->varName)->type->u.array.elem), NULL, NULL);
                         Operand newAddr = CreateOperand(OP_TMPVAR, -1, NULL, NULL);
-                        struct InterCodes *newInterCode = CreateInterCode(IC_ASSIGN, newAddr, newOp1, NULL, NULL);
-                        InsertInterCode(newInterCode);
                         Operand newOff = CreateOperand(OP_TMPVAR, -1, NULL, NULL);
-                        newInterCode = CreateInterCode(IC_MUL, newConstant, newOp2, newOff, NULL);
+                        struct InterCodes *newInterCode = CreateInterCode(IC_MUL, newConstant, newOp2, newOff, NULL);
                         InsertInterCode(newInterCode);
-                        newInterCode = CreateInterCode(IC_ADD, newAddr, newOff, newAddr, NULL);
+                        newInterCode = CreateInterCode(IC_ADD, newOp1, newOff, newAddr, NULL);
                         InsertInterCode(newInterCode);
 
                         SymbolNode symbolnode = SearchSymbol(newOp1->varName);
@@ -963,9 +959,6 @@ Operand translate_Exp(struct TreeNode *curNode)
                         var_count--;
                         newOp2->u.var_no = symbolnode->var_no;
 
-                        Operand newAddr = CreateOperand(OP_TMPVAR, -1, NULL, NULL);
-                        struct InterCodes *newInterCode = CreateInterCode(IC_ASSIGN, newAddr, newOp1, NULL, NULL);
-                        InsertInterCode(newInterCode);
                         int offset = 0;
                         FieldList fieldlist = SearchSymbol(newOp1->varName)->type->u.structure.fieldlist;
                         while (fieldlist != NULL && strcmp(fieldlist->name, symbolnode->sName) != 0)
@@ -974,7 +967,8 @@ Operand translate_Exp(struct TreeNode *curNode)
                             fieldlist = fieldlist->tail;
                         }
                         Operand newOff = CreateOperand(OP_CONSTANT, offset, NULL, NULL);
-                        newInterCode = CreateInterCode(IC_ADD, newAddr, newOff, newAddr, NULL);
+                        Operand newAddr = CreateOperand(OP_TMPVAR, -1, NULL, NULL);
+                        struct InterCodes *newInterCode = CreateInterCode(IC_ADD, newOp1, newOff, newAddr, NULL);
                         InsertInterCode(newInterCode);
 
                         if (symbolnode->type->kind == BASIC)

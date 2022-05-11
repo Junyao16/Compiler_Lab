@@ -1,24 +1,18 @@
-struct Operands
+int fact(int n)
 {
-int o1;
-int o2;
-};
-
-struct Operands1
-{
-struct Operands a[10];
-};
-
-int add(struct Operands temp)
-{
-return (temp.o1 + temp.o2);
+if (n == 1)
+return n;
+else
+return (n * fact(n - 1));
 }
 int main()
 {
-int n;
-struct Operands1 op;
-op.a[0].o1 = 1;
-op.a[5].o2 = 2;
-write(op.a[0].o1);
+int m, result;
+m = read();
+if (m > 1)
+result = fact(m);
+else
+result = 1;
+write(result);
 return 0;
 }
