@@ -713,10 +713,48 @@ Operand translate_Exp(struct TreeNode *curNode)
                         if (strcmp(curNode->firstChild->firstChild->nodeName, "ID") == 0 && curNode->firstChild->firstChild->nextSibling == NULL)
                         {
                             Operand newOp1 = translate_Exp(curNode->firstChild);
-                            struct InterCodes *newInterCode = CreateInterCode(IC_ASSIGN, newOp1, newOp2, NULL, NULL);
-                            InsertInterCode(newInterCode);
-                            Operand newOp = newOp1;
-                            return newOp;
+                            SymbolNode symbolnode1 = SearchSymbol(newOp1->varName);
+                            if (symbolnode1->type->kind == BASIC)
+                            {
+                                struct InterCodes *newInterCode = CreateInterCode(IC_ASSIGN, newOp1, newOp2, NULL, NULL);
+                                InsertInterCode(newInterCode);
+                                Operand newOp = newOp1;
+                                return newOp;
+                            }
+                            else
+                            {
+                                SymbolNode symbolnode2 = SearchSymbol(newOp2->varName);
+                                int size1 = GetSize(symbolnode1->type);
+                                int size2 = GetSize(symbolnode2->type);
+                                Operand newAddr1 = CreateOperand(OP_TMPVAR, -1, NULL, NULL);
+                                Operand newAddr2 = CreateOperand(OP_TMPVAR, -1, NULL, NULL);
+                                struct InterCodes *newInterCode;
+                                newInterCode = CreateInterCode(IC_ASSIGN, newAddr1, newOp1, NULL, NULL);
+                                InsertInterCode(newInterCode);
+                                newInterCode = CreateInterCode(IC_ASSIGN, newAddr2, newOp2, NULL, NULL);
+                                InsertInterCode(newInterCode);
+                                Operand newTmp = CreateOperand(OP_TMPVAR, -1, NULL, NULL);
+                                newInterCode = CreateInterCode(IC_GET_CONTENT, newTmp, newAddr2, NULL, NULL);
+                                InsertInterCode(newInterCode);
+                                newInterCode = CreateInterCode(IC_ASG_CONTENT, newAddr1, newTmp, NULL, NULL);
+                                InsertInterCode(newInterCode);
+                                int offset = 4;
+                                while (offset < size1 && offset < size2)
+                                {
+                                    Operand newOff = CreateOperand(OP_CONSTANT, 4, NULL, NULL);
+                                    newInterCode = CreateInterCode(IC_ADD, newAddr1, newOff, newAddr1, NULL);
+                                    InsertInterCode(newInterCode);
+                                    newInterCode = CreateInterCode(IC_ADD, newAddr2, newOff, newAddr2, NULL);
+                                    InsertInterCode(newInterCode);
+                                    newTmp = CreateOperand(OP_TMPVAR, -1, NULL, NULL);
+                                    newInterCode = CreateInterCode(IC_GET_CONTENT, newTmp, newAddr2, NULL, NULL);
+                                    InsertInterCode(newInterCode);
+                                    newInterCode = CreateInterCode(IC_ASG_CONTENT, newAddr1, newTmp, NULL, NULL);
+                                    InsertInterCode(newInterCode);
+                                    offset += 4;
+                                }
+                                return NULL;
+                            }
                         }
                         else if (strcmp(curNode->firstChild->firstChild->nodeName, "Exp") == 0 && curNode->firstChild->firstChild->nextSibling != NULL)
                         {

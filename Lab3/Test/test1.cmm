@@ -1,18 +1,13 @@
-int fact(int n)
-{
-if (n == 1)
-return n;
-else
-return (n * fact(n - 1));
-}
-int main()
-{
-int m, result;
-m = read();
-if (m > 1)
-result = fact(m);
-else
-result = 1;
-write(result);
-return 0;
+struct a{
+	int a1;
+	int a2;
+};
+
+int main(){
+	struct a b;
+	struct a c;
+	b.a1 = 10;
+b.a2 = 5;
+c= b;
+	return 0;
 }
