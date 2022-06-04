@@ -340,6 +340,10 @@ void GenerateInterCode()
 // | empty
 void translate_ExtDefList(struct TreeNode *curNode)
 {
+    if (haveError)
+    {
+        return;
+    }
     if (curNode != NULL && strcmp(curNode->nodeName, "ExtDefList") == 0)
     {
         if (curNode->firstChild != NULL)
@@ -358,6 +362,10 @@ void translate_ExtDefList(struct TreeNode *curNode)
 // | Specifier FunDec CompSt
 void translate_ExtDef(struct TreeNode *curNode)
 {
+    if (haveError)
+    {
+        return;
+    }
     if (curNode != NULL && strcmp(curNode->nodeName, "ExtDef") == 0)
     {
         if (curNode->firstChild != NULL)
@@ -381,6 +389,10 @@ void translate_ExtDef(struct TreeNode *curNode)
 // | VarDec LB INT RB
 Operand translate_VarDec(struct TreeNode *curNode)
 {
+    if (haveError)
+    {
+        return NULL;
+    }
     if (curNode != NULL && strcmp(curNode->nodeName, "VarDec") == 0)
     {
         if (curNode->firstChild != NULL)
@@ -430,6 +442,10 @@ Operand translate_VarDec(struct TreeNode *curNode)
 // | ID LP RP
 void translate_FunDec(struct TreeNode *curNode)
 {
+    if (haveError)
+    {
+        return;
+    }
     if (curNode != NULL && strcmp(curNode->nodeName, "FunDec") == 0)
     {
         if (curNode->firstChild != NULL && strcmp(curNode->firstChild->nodeName, "ID") == 0)
@@ -461,6 +477,10 @@ void translate_FunDec(struct TreeNode *curNode)
 // CompSt → LC DefList StmtList RC
 void translate_CompSt(struct TreeNode *curNode)
 {
+    if (haveError)
+    {
+        return;
+    }
     if (curNode != NULL && strcmp(curNode->nodeName, "CompSt") == 0)
     {
         if (curNode->firstChild != NULL && strcmp(curNode->firstChild->nodeName, "LC") == 0)
@@ -485,6 +505,10 @@ void translate_CompSt(struct TreeNode *curNode)
 // | empty
 void translate_StmtList(struct TreeNode *curNode)
 {
+    if (haveError)
+    {
+        return;
+    }
     if (curNode != NULL && strcmp(curNode->nodeName, "StmtList") == 0)
     {
         if (curNode->firstChild != NULL && strcmp(curNode->firstChild->nodeName, "Stmt") == 0)
@@ -506,6 +530,10 @@ void translate_StmtList(struct TreeNode *curNode)
 // | WHILE LP Exp RP Stmt
 void translate_Stmt(struct TreeNode *curNode)
 {
+    if (haveError)
+    {
+        return;
+    }
     if (curNode != NULL && strcmp(curNode->nodeName, "Stmt") == 0)
     {
         if (curNode->firstChild != NULL)
@@ -605,6 +633,10 @@ void translate_Stmt(struct TreeNode *curNode)
 // | empty
 void translate_DefList(struct TreeNode *curNode)
 {
+    if (haveError)
+    {
+        return;
+    }
     if (curNode != NULL && strcmp(curNode->nodeName, "DefList") == 0)
     {
         if (curNode->firstChild != NULL && strcmp(curNode->firstChild->nodeName, "Def") == 0)
@@ -621,6 +653,10 @@ void translate_DefList(struct TreeNode *curNode)
 // Def → Specifier DecList SEMI
 void translate_Def(struct TreeNode *curNode)
 {
+    if (haveError)
+    {
+        return;
+    }
     if (curNode != NULL && strcmp(curNode->nodeName, "Def") == 0)
     {
         if (curNode->firstChild != NULL && strcmp(curNode->firstChild->nodeName, "Specifier") == 0)
@@ -637,6 +673,10 @@ void translate_Def(struct TreeNode *curNode)
 // | Dec COMMA DecList
 void translate_DecList(struct TreeNode *curNode)
 {
+    if (haveError)
+    {
+        return;
+    }
     if (curNode != NULL && strcmp(curNode->nodeName, "DecList") == 0)
     {
         if (curNode->firstChild != NULL && strcmp(curNode->firstChild->nodeName, "Dec") == 0)
@@ -657,6 +697,10 @@ void translate_DecList(struct TreeNode *curNode)
 // | VarDec ASSIGNOP Exp
 void translate_Dec(struct TreeNode *curNode)
 {
+    if (haveError)
+    {
+        return;
+    }
     if (curNode != NULL && strcmp(curNode->nodeName, "Dec") == 0)
     {
         if (curNode->firstChild != NULL && strcmp(curNode->firstChild->nodeName, "VarDec") == 0)
@@ -699,6 +743,10 @@ void translate_Dec(struct TreeNode *curNode)
 // | FLOAT
 Operand translate_Exp(struct TreeNode *curNode)
 {
+    if (haveError)
+    {
+        return NULL;
+    }
     if (curNode != NULL && strcmp(curNode->nodeName, "Exp") == 0)
     {
         if (curNode->firstChild != NULL)
@@ -1157,6 +1205,10 @@ Operand translate_Exp(struct TreeNode *curNode)
 // | Exp
 void translate_Args(struct TreeNode *curNode)
 {
+    if (haveError)
+    {
+        return;
+    }
     if (curNode != NULL && strcmp(curNode->nodeName, "Args") == 0)
     {
         if (curNode->firstChild != NULL && strcmp(curNode->firstChild->nodeName, "Exp") == 0)
@@ -1196,6 +1248,10 @@ void translate_Args(struct TreeNode *curNode)
 // | FLOAT
 void translate_Cond(struct TreeNode *curNode, Operand label_true, Operand label_false)
 {
+    if (haveError)
+    {
+        return;
+    }
     if (curNode != NULL && strcmp(curNode->nodeName, "Exp") == 0)
     {
         if (curNode->firstChild != NULL)
